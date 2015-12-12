@@ -1,14 +1,13 @@
 import re
 regex = r'(\\\\|\\\"|\\x([a-f0-9]).|[a-zA-Z0-9])'
-def in_memory_size(str):
-	str = str.strip('\n')
-	return len(re.findall(regex, str))
+def in_memory_size(s):
+	s = s.strip('\n')
+	return len(re.findall(regex, s))
 
-def new_encoding(str):
-	str = re.sub(r'\\', r'\\\\', str)
-	print str
-	str = re.sub(r'\"', '\\\"', str)
-	return '"' + str + '"'
+def new_encoding(s):
+	s = re.sub(r'\\', r'\\\\', s)
+	s = re.sub(r'\"', '\\\"', s)
+	return '"' + s + '"'
 	
 with open('input.txt') as f:
 	f = f.readlines()

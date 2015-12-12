@@ -45,7 +45,7 @@ def interpret(instr):
 			env[v].append(exp)
 		if i == 'VARIABLE':
 			v = instr['VARIABLE'][0]
-			eval(v)
+			ev(v)
 			return interpret(env.get(v))
 		if i == 'NOT':
 			v = interpret(instr['NOT'][0])
@@ -67,7 +67,7 @@ def interpret(instr):
 			n1, n2 = interpret(e1), interpret(e2)
 			return n1 >> n2
 			
-def eval(v):
+def ev(v):
 	e = env.get(v)
 	n = interpret(e)
 	env[v] = {'NUMBER': [n]}
@@ -87,6 +87,6 @@ with open('input.txt') as f:
 	instr.append('3176 -> b')
 	parse_input(instr)
 	build_mapping(parsed_instructions)
-	eval('a')
+	ev('a')
 	print env.get('a')
 	
