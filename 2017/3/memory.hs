@@ -1,20 +1,28 @@
 main = do
   let input = 368078
-  let completeSquare = closestOddSquare (input - 1)
-  let complete = completeSquare ^ 2
-  let ring = (completeSquare + 2) `div` 2
-  let center = (completeSquare + 2) `div` 2
-  let pos = (input - complete) `mod` (completeSquare + 1)
-  let distToCenter = abs (pos - center)
-  let distance = ring + distToCenter
-  print distance
+  -- let completeSquare = closestOddSquare (input - 1)
+  -- let complete = completeSquare ^ 2
+  -- let ring = (completeSquare + 2) `div` 2
+  -- let center = (completeSquare + 2) `div` 2
+  -- let pos = (input - complete) `mod` (completeSquare + 1)
+  -- let distToCenter = abs (pos - center)
+  -- let distance = ring + distToCenter
+  let pos = spiral 4 0 (0,0)
+  print pos
 
-getSquare (x,y) = 
-  | (0,0) = 1
-  | (0,1) = getSquare (0,0)
-  | otherwise = getSquare (x-1, y) + getSquare (x, y - 1) + getSquare (x-1, y-1)
+data Direction = L | R | U | D
+
+spiral :: Int -> Int -> (Int, Int) -> (Int, Int)
+spiral walk elapsed (x,y)
+  | walk == 1 = (x,y)
+  | otherwise = spiral (walk -1) (elapsed + 1) step
+  where
+    bound = (walk + elapsed) 
+    step = 
+      
 
 
+ 
 
 closestOddSquare :: Int -> Int
 closestOddSquare x = 
