@@ -10,7 +10,6 @@ main = do
   let pos = spiral 4 0 (0,0)
   print pos
 
-data Direction = L | R | U | D
 
 spiral :: Int -> Int -> (Int, Int) -> (Int, Int)
 spiral walk elapsed (x,y)
