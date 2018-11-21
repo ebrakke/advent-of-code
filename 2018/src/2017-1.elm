@@ -21,13 +21,14 @@ main =
 
 type alias Model =
     { input : String
-    , result : String
+    , result1 : String
+    , result2 : String
     }
 
 
 init : Model
 init =
-    Model "" ""
+    Model "" "" ""
 
 
 
@@ -42,7 +43,9 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         Change newInput ->
-            { model | input = newInput, result = String.fromInt <| sumCaptcha <| parseString <| newInput }
+            { model | input = newInput
+            , result1 = solve1 newInput
+            , result2 = solve2 newInput } 
 
 
 
@@ -54,29 +57,40 @@ view model =
     div []
         [ input [ placeholder "Captcha Input", value model.input, onInput Change ] []
         , div []
-            [ h4 [] [ text "Result" ]
-            , text model.result
+            [ h4 [] [ text "Result 1" ]
+            , text model.result1
             ]
+        , div []
+            [ h4 [] [ text "Result 2" ]
+            , text model.result2]
         ]
 
 
 
 -- HELPERS
 
+solve1 : String -> String
+solve1 input =
+    input |> parseInput |> pairShiftedLists 1 |> sumCaptcha |> String.fromInt    
 
-parseString : String -> ( List Int, List Int )
-parseString input =
-    let
-        parsedInput =
-            List.map (\s -> String.toInt s |> Maybe.withDefault 0) <|
-                String.split
-                    ""
-                    input
+solve2 : String -> String
+solve2 input = 
+    input |> parseInput |> pairShiftedLists ((String.length input) // 2) |> sumCaptcha |> String.fromInt
 
-        shifted =
-            [ Maybe.withDefault 0 <| List.head <| List.reverse parsedInput ] ++ (List.reverse <| Maybe.withDefault [] <| List.tail <| List.reverse parsedInput)
-    in
-    ( parsedInput, shifted )
+parseInput : String -> List Int
+parseInput input =
+    List.map (\s -> String.toInt s |> Maybe.withDefault 0) <|
+        String.split
+            ""
+            input
+
+pairShiftedLists : Int -> List Int -> (List Int, List Int)
+pairShiftedLists shift xs =
+    (xs, shiftList xs shift)
+
+shiftList : List Int -> Int -> List Int
+shiftList xs shift = 
+    (List.reverse xs |> List.take shift |> List.reverse) ++ (List.reverse xs |> List.drop shift |> List.reverse)
 
 
 sumCaptcha : (List Int, List Int) -> Int
@@ -94,6 +108,6 @@ sumCaptcha inputs =
 
         ( x :: xs, y :: ys ) ->
             sumCaptcha ([ x ],[ y ]) + sumCaptcha (xs, ys) 
-        
+
         (_, _) -> 0
         
