@@ -2,7 +2,7 @@ module Main exposing (Model, init, main)
 
 import Browser
 import Debug exposing (log, toString)
-import Html exposing (Attribute, Html, div, h4, input, text)
+import Html exposing (Attribute, Html, div, h4, textarea, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 
@@ -55,7 +55,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ input [ placeholder "Captcha Input", value model.input, onInput Change ] []
+        [ textarea [ placeholder "Captcha Input", value model.input, onInput Change ] []
         , div []
             [ h4 [] [ text "Result 1" ]
             , text model.result1
