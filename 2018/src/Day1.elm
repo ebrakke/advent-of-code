@@ -101,18 +101,22 @@ solve2 input =
         parsed =
             parseInput input
     in
-    sumAndCheckFrequency parsed (Set.fromList [ 0 ]) 0 parsed 0
+    sumAndCheckFrequency parsed (Set.fromList [ 0 ]) 0 parsed
 
 
-
--- Note, this can recurse if the initial input does not actually terminate!
-
-
-sumAndCheckFrequency : List Int -> Set Int -> Int -> List Int -> Int -> Int
-sumAndCheckFrequency restInput frequency sum allInput loops =
+sumAndCheckFrequency : List Int -> Set Int -> Int -> List Int -> Int
+sumAndCheckFrequency restInput frequency sum allInput =
     case restInput of
         [] ->
-            sumAndCheckFrequency allInput frequency sum allInput (loops + 1)
+            let
+                forever =
+                    willRecurseForever allInput
+            in
+            if forever then
+                0
+
+            else
+                sumAndCheckFrequency allInput frequency sum allInput
 
         x :: xs ->
             let
@@ -126,4 +130,16 @@ sumAndCheckFrequency restInput frequency sum allInput loops =
                 newSum
 
             else
-                sumAndCheckFrequency xs newFrequency newSum allInput (loops + 1)
+                sumAndCheckFrequency xs newFrequency newSum allInput
+
+
+willRecurseForever : List Int -> Bool
+willRecurseForever input =
+    let
+        negatives =
+            List.filter ((>) 0) input
+
+        positives =
+            List.filter ((<) 0) input
+    in
+    List.sum positives == 0 || List.sum negatives == 0
