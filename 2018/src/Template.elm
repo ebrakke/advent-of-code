@@ -1,8 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div)
-import Html.Attributes exposing (class)
+import Html exposing (Html, div, text)
+import Html.Attributes as Attr exposing (class)
+import Html.Events as Evt
 
 
 main =
@@ -14,22 +15,25 @@ main =
         }
 
 
-type Model
-    = Nothing
+type alias Model =
+    { puzzleInput : String
+    }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Nothing, Cmd.none )
+    ( Model "", Cmd.none )
 
 
 type Msg
-    = Noop
+    = Change String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        Change str ->
+            ( { model | puzzleInput = str }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -39,4 +43,9 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div [ class "container" ] []
+    div [ class "container" ]
+        [ div []
+            [ Html.label [ Attr.for "puzzleInput" ] [ text "Puzzle input" ]
+            , Html.input [ Attr.name "puzzleInput", Evt.onInput Change ] []
+            ]
+        ]
