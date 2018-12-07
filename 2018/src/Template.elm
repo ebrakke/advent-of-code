@@ -17,12 +17,13 @@ main =
 
 type alias Model =
     { puzzleInput : String
+    , parsedInput : String
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model "", Cmd.none )
+    ( Model "" "", Cmd.none )
 
 
 type Msg
@@ -33,7 +34,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Change str ->
-            ( { model | puzzleInput = str }, Cmd.none )
+            ( { model | puzzleInput = str, parsedInput = "" }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -46,6 +47,10 @@ view model =
     div [ class "container" ]
         [ div []
             [ Html.label [ Attr.for "puzzleInput" ] [ text "Puzzle input" ]
-            , Html.input [ Attr.name "puzzleInput", Evt.onInput Change ] []
+            , Html.textarea [ Attr.name "puzzleInput", Evt.onInput Change ] []
+            ]
+        , div []
+            [ Html.p [] [ text "parsed input is" ]
+            , Html.p [] [ text model.parsedInput ]
             ]
         ]
