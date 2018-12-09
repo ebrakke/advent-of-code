@@ -59,6 +59,10 @@ view model =
             [ Html.p [] [ text "Answer to part 1 is " ]
             , Html.p [] [ text <| Debug.toString <| solve1 model.parsedInput ]
             ]
+        , div []
+            [ Html.p [] [ text "Answer to part 2 is " ]
+            , Html.p [] [ text <| String.fromInt <| solve2 model.parsedInput ]
+            ]
         ]
 
 
@@ -73,7 +77,7 @@ type alias Location =
 
 
 type alias Grid =
-    List ( Int, Int )
+    List (List ( Int, Int ))
 
 
 type Bound
@@ -90,12 +94,30 @@ solve1 locations =
             getGridFromLocations locations
 
         distances =
-            Debug.log "Distances " <| getDistances grid locations
+            getDistances grid locations
 
         freq =
-            getFrequencies distances
+            getFrequencies <| List.concat distances
+
+        noInfinite =
+            Dict.toList freq |> List.filter (\( ( x, y ), c ) -> not <| isInfiniteLocation distances (Location x y))
+
+        sorted =
+            List.sortBy (\( p, d ) -> d) noInfinite
     in
-    Dict.toList freq |> List.sortBy (\( f, c ) -> c) |> List.reverse |> List.head |> Maybe.withDefault ( ( -1, -1 ), -1 )
+    sorted |> List.reverse |> List.head |> Maybe.withDefault ( ( -1, -1 ), -1 )
+
+
+solve2 : List Location -> Int
+solve2 locations =
+    let
+        grid =
+            List.map (\y -> List.map (\x -> ( x, y )) (List.range 0 500)) (List.range 0 500) |> List.concat
+
+        distances =
+            List.map (\p -> getDistanceToAllLocations p locations) grid
+    in
+    List.length <| List.filter (\n -> n < 10000) distances
 
 
 parseInput : String -> List Location
@@ -169,7 +191,7 @@ getFiniteGrid bounds =
                 maxY =
                     max l3.y l4.y
             in
-            List.range minX maxX |> List.map (\y -> generateRow minX maxX y) |> List.concat
+            List.range minY maxY |> List.map (\y -> generateRow minX maxX y)
 
         _ ->
             []
@@ -185,9 +207,9 @@ getDistance ( x1, y1 ) { x, y } =
     abs (x1 - x) + abs (y1 - y)
 
 
-getDistances : Grid -> List Location -> List (Maybe Location)
+getDistances : Grid -> List Location -> List (List (Maybe Location))
 getDistances grid locs =
-    List.map (\p -> getClosestLocation p locs) grid
+    List.map (\r -> List.map (\p -> getClosestLocation p locs) r) grid
 
 
 getClosestLocation : ( Int, Int ) -> List Location -> Maybe Location
@@ -211,3 +233,26 @@ getClosestLocation point locs =
 getFrequencies : List (Maybe Location) -> Dict ( Int, Int ) Int
 getFrequencies distances =
     List.filterMap identity distances |> List.map (\l -> ( l.x, l.y )) |> frequencies
+
+
+isInfiniteLocation : List (List (Maybe Location)) -> Location -> Bool
+isInfiniteLocation locs loc =
+    let
+        top =
+            List.head locs |> Maybe.withDefault [] |> List.filterMap identity
+
+        left =
+            List.map (\x -> List.head x |> Maybe.withDefault Nothing) locs |> List.filterMap identity
+
+        right =
+            List.map (\x -> List.reverse x |> List.head |> Maybe.withDefault Nothing) locs |> List.filterMap identity
+
+        bottom =
+            List.reverse locs |> List.head |> Maybe.withDefault [] |> List.filterMap identity
+    in
+    List.member loc top || List.member loc left || List.member loc right || List.member loc bottom
+
+
+getDistanceToAllLocations : ( Int, Int ) -> List Location -> Int
+getDistanceToAllLocations point locs =
+    List.foldl (\l acc -> acc + getDistance point l) 0 locs
