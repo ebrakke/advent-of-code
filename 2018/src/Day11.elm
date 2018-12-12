@@ -109,25 +109,25 @@ getPowerBlock ( x, y ) size grid =
     List.foldl (+) 0 cellValues
 
 
-solve1 : Int -> Int -> Grid -> ( ( Int, Int ), Int, Int )
-solve1 gridSerialNumber size grid =
+solve1 : Int -> Grid -> ( ( Int, Int ), Int, Int )
+solve1 size grid =
     let
         ps =
             Dict.keys grid
 
         blocks =
             List.map (\p -> ( p, getPowerBlock p size grid )) ps
+
+        _ =
+            Debug.log "Size" size
     in
-    List.sortBy Tuple.second blocks |> List.reverse |> List.head |> Maybe.withDefault ( ( 0, 0 ), 0 ) |> (\( p, power ) -> ( p, power, size ))
+    Debug.log "Output" (List.sortBy Tuple.second blocks |> List.reverse |> List.head |> Maybe.withDefault ( ( 0, 0 ), 0 ) |> (\( p, power ) -> ( p, power, size )))
 
 
-solve2 : Int -> Int -> ( ( Int, Int ), Int, Int )
-solve2 gridSerialNumber size =
+solve2 : Int -> List ( ( Int, Int ), Int, Int )
+solve2 gridSerialNumber =
     let
         grid =
             generateGrid ( 1, 1 ) ( 300, 300 ) gridSerialNumber
-
-        maxes =
-            List.map (\s -> solve1 gridSerialNumber s grid) (List.range 0 300)
     in
-    List.sortBy (\( _, power, _ ) -> power) maxes |> List.reverse |> List.head |> Maybe.withDefault ( ( 0, 0 ), 0, 0 )
+    List.map (\s -> solve1 s grid) (List.range 3 40 |> List.reverse)
