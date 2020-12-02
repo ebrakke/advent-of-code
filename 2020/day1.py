@@ -9,6 +9,7 @@ def rotate(l, n):
 def solve_part_one(inp):
     found_sum = (0, 0, 0)
     for offset in range(1, len(inp)):
+        print(offset)
         sums = [(i, j, i + j) for i in inp for j in rotate(inp, offset) if i+j == 2020]
         if len(sums) > 0:
             found_sum = sums[0]
@@ -23,6 +24,7 @@ def solve_part_two(inp):
         rotation_two = rotate(inp, offset + 1)
         sums = [(i, j, k, i + j) for i in inp for j in rotation_one for k in rotation_two if i+j+k == 2020]
         if len(sums) > 0:
+            print(offset)
             found_sum = sums[0]
             break
 
